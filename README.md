@@ -30,7 +30,9 @@ This command will report the total number of tabs you have open; the total numbe
 This command will report how many tabs are open for each site.  For example you can tell that you have many tabs that are all mail.google.com or the calendar.  You can also see random single instances of tabs open to websites you have opened a long time ago and no longer care about.
 
 ### Clean Up Tabs with No Groups
-This command will close tabs.  This command assumes you are organizing open tabs you care about into named tab groups.  This command has a list of domains like mail.google.com, contacts.google.com, jira, photos.google.com, calendar.google.com, etc.  What the command does is it closes all the tabs to these domains **if** the tab is not organized into a tab group.  The idea is if you are always opening these domains to get something quick done (like check your calendar) then you don't care about this tab in the long run.  If you did care you would have placed it into a named tab group.
+This command will close tabs.  This command assumes you are organizing open tabs you care about into named tab groups.  This command has a list of domains like mail.google.com, contacts.google.com, jira, photos.google.com, calendar.google.com, etc.  You should change/update/extend this list to domains you want closed in one foul swoop.  See the "Extending and tuning Functionality" section below.  
+
+What the command does is it closes all the tabs to these domains **if** the tab is not organized into a tab group.  The idea is if you are always opening these domains to get something quick done (like check your calendar) then you don't care about this tab in the long run.  If you did care you would have placed it into a named tab group.
 
 ### Duplicates Report
 This report lists all the duplicate URLs.  More specifically it reports all tabs and the counts for the URLs. This is in order of most duplicated to least.  Records include the URL, so you can click on the URL to remind you of the website you have visited.  
