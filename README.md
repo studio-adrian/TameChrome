@@ -24,6 +24,8 @@ Once that window is open then seeing the output of the commands will be clear.
 ### Open Tabs Report
 This command will report the total number of tabs you have open; the total number of windows you have open; and for each window the number of tabs you have on that window.  This is useful to tell you if you have many single tab (or low tab count) windows open, or a few with many tabs.
 
+![OpenTabsReport](OpenTabsReport.png)
+
 ### Domain Report
 This command will report how many tabs are open for each site.  For example you can tell that you have many tabs that are all mail.google.com or the calendar.  You can also see random single instances of tabs open to websites you have opened a long time ago and no longer care about.
 
@@ -32,6 +34,8 @@ This command will close tabs.  This command assumes you are organizing open tabs
 
 ### Duplicates Report
 This report lists all the duplicate URLs.  More specifically it reports all tabs and the counts for the URLs. This is in order of most duplicated to least.  Records include the URL, so you can click on the URL to remind you of the website you have visited.  
+
+![Duplicates Report](Duplicates Report.png)
 
 ### Close Duplicates
 This command will close tabs.  It will close duplicates within a tab group, only leaving one.  It will close duplicates outside of groups, regarless of window they appear. The bottom line is you may still end up with duplicates, but not within a group.
