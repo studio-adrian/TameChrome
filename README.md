@@ -5,6 +5,8 @@ This repo creates a simple extension that helps you manage the number of windows
 
 The extension is simple and can be improved.
 
+![Menu](Screenshot.png)
+
 ## Installation
 Download the repo. Open Chrome, go to (3 Dot Menu in Chrome -> Extensions -> Manage Extensions).  Turn on Developer Mode (a slider in the upper right of the Extension Tab); this will allow you to add extensions you write yourself.  Pick on the "Load Unpacked" button, navigate to the directory you have downloaded this repo to.  You should see a "Duplicate Tab Counter" tile added to your extensions list.
 
