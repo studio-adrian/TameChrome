@@ -35,7 +35,7 @@ This command will close tabs.  This command assumes you are organizing open tabs
 ### Duplicates Report
 This report lists all the duplicate URLs.  More specifically it reports all tabs and the counts for the URLs. This is in order of most duplicated to least.  Records include the URL, so you can click on the URL to remind you of the website you have visited.  
 
-![Duplicates Report](Duplicates Report.png)
+![Duplicates Report](DuplicatesReport.png)
 
 ### Close Duplicates
 This command will close tabs.  It will close duplicates within a tab group, only leaving one.  It will close duplicates outside of groups, regarless of window they appear. The bottom line is you may still end up with duplicates, but not within a group.
