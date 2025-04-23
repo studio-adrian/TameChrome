@@ -5,6 +5,8 @@ This repo creates a simple extension that helps you manage the number of windows
 
 The extension is simple and can be improved.
 
+![Menu](Screenshot.png)
+
 ## Installation
 Download the repo. Open Chrome, go to (3 Dot Menu in Chrome -> Extensions -> Manage Extensions).  Turn on Developer Mode (a slider in the upper right of the Extension Tab); this will allow you to add extensions you write yourself.  Pick on the "Load Unpacked" button, navigate to the directory you have downloaded this repo to.  You should see a "Duplicate Tab Counter" tile added to your extensions list.
 
@@ -22,14 +24,20 @@ Once that window is open then seeing the output of the commands will be clear.
 ### Open Tabs Report
 This command will report the total number of tabs you have open; the total number of windows you have open; and for each window the number of tabs you have on that window.  This is useful to tell you if you have many single tab (or low tab count) windows open, or a few with many tabs.
 
+![OpenTabsReport](OpenTabsReport.png)
+
 ### Domain Report
 This command will report how many tabs are open for each site.  For example you can tell that you have many tabs that are all mail.google.com or the calendar.  You can also see random single instances of tabs open to websites you have opened a long time ago and no longer care about.
 
 ### Clean Up Tabs with No Groups
-This command will close tabs.  This command assumes you are organizing open tabs you care about into named tab groups.  This command has a list of domains like mail.google.com, contacts.google.com, jira, photos.google.com, calendar.google.com, etc.  What the command does is it closes all the tabs to these domains **if** the tab is not organized into a tab group.  The idea is if you are always opening these domains to get something quick done (like check your calendar) then you don't care about this tab in the long run.  If you did care you would have placed it into a named tab group.
+This command will close tabs.  This command assumes you are organizing open tabs you care about into named tab groups.  This command has a list of domains like mail.google.com, contacts.google.com, jira, photos.google.com, calendar.google.com, etc.  You should change/update/extend this list to domains you want closed in one foul swoop.  See the "Extending and tuning Functionality" section below.  
+
+What the command does is it closes all the tabs to these domains **if** the tab is not organized into a tab group.  The idea is if you are always opening these domains to get something quick done (like check your calendar) then you don't care about this tab in the long run.  If you did care you would have placed it into a named tab group.
 
 ### Duplicates Report
 This report lists all the duplicate URLs.  More specifically it reports all tabs and the counts for the URLs. This is in order of most duplicated to least.  Records include the URL, so you can click on the URL to remind you of the website you have visited.  
+
+![Duplicates Report](DuplicatesReport.png)
 
 ### Close Duplicates
 This command will close tabs.  It will close duplicates within a tab group, only leaving one.  It will close duplicates outside of groups, regarless of window they appear. The bottom line is you may still end up with duplicates, but not within a group.
