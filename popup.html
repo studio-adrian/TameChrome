@@ -1,18 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Duplicate Tab Counter</title>
+  <title>TameChrome</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      font-family: Arial, sans-serif;
+      margin: 10px;
+    }
+
+    #popupConsole {
+      width: calc(300ch); /* Approximate width for 300 characters */
+      height: calc(1.2em * 42); /* 42 lines of text, assuming 1.2em line height */
+      overflow: scroll; /* Enable both vertical and horizontal scrollbars */
+      background-color: #f7f7f7;
+      color: #0070f0;
+      font-family: monospace;
+      padding: 5px;
+      border: 1px solid #ccc;
+      margin-right: 10px;
+      box-sizing: border-box; /* Include padding and border in width/height */
+    }
+  </style>
 </head>
 <body>
-  <button id="opentabsReport">Open Tabs Report</button>
-  <button id="domainReport">Domain Report</button>
-  <button id="cleanUp">Clean Up Tabs with No Groups</button>
-  <button id="duplicatesReport">Duplicates Report</button>
-  <button id="duplicatesCleanUp">Close Duplicates</button>
-  <button id="popForward1TabWindows">Pop forward windows with 1 tab</button>
-  <button id="popForward2TabWindows">Pop forward windows with 2 tabs</button>
-  <button id="popForward3TabWindows">Pop forward windows with 3 tabs</button>
-  <button id="popForwardWindowsWithNoGroups">Pop forward windows with no groups on them</button>
-    <script src="popup.js"></script>
+  <div id="popupConsole"></div>
+
+  <div>
+    <button id="opentabsReport">Open Tabs Report</button>
+    <button id="domainReport">Domain Report</button>
+    <button id="cleanUp">Clean Up Tabs with No Groups</button>
+    <button id="duplicatesReport">Duplicates Report</button>
+    <button id="duplicatesCleanUp">Close Duplicates</button>
+    <button id="popForward1TabWindows">Pop forward windows with 1 tab</button>
+    <button id="popForward2TabWindows">Pop forward windows with 2 tabs</button>
+    <button id="popForward3TabWindows">Pop forward windows with 3 tabs</button>
+    <button id="popForwardWindowsWithNoGroups">Pop forward windows with no groups on them</button>
+  </div>
+
+  <script src="popup.js"></script>
 </body>
 </html>

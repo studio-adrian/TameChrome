@@ -1,20 +1,25 @@
+function writeToPopupConsole(text) {
+    chrome.runtime.sendMessage({ action: "writeToPopupConsole", text: text });
+}
+
+function clearPopupConsole() {
+    chrome.runtime.sendMessage({ action: "clearPopupConsole" });
+}
+
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
+        clearPopupConsole();
         if (request.action === "opentabsReport") {
-            console.log("Received opentabsReport message.");
-            console.log("Report on the number of tabs and windows open, how many are single tab windows...");
-
+            writeToPopupConsole("<br>Open Tabs Report...<br>");
             chrome.tabs.query({}, function (tabs) {
-
-                console.log("Tabs queried:", tabs);
+                writeToPopupConsole(`Tabs queried:<br>${tabs.map((tab, index) => `${index + 1}. ${tab.title}`).join('<br>')}`);
 
                 if (!tabs || tabs.length === 0) {
-                    console.log("No tabs found in any window.");
+                    writeToPopupConsole("No tabs found in any window.");
                     return;
                 }
 
-                console.log("Total tabs found in all windows:", tabs.length);
-                // print the number of windows open
+                writeToPopupConsole(`Total tabs found in all windows: ${tabs.length}<br>`);
                 let windowCount = 0;
                 const windowMap = new Map();
                 for (const tab of tabs) {
@@ -24,9 +29,8 @@ chrome.runtime.onMessage.addListener(
                         windowMap.set(tab.windowId, [tab]);
                     }
                 }
-                console.log("Total windows open:", windowMap.size);
+                writeToPopupConsole(`Total windows open: ${windowMap.size}<br>`);
 
-                // for a report where the number of windows with the same number of tabs is counted
                 const windowCounts = new Map();
                 for (const [windowId, tabList] of windowMap) {
                     if (windowCounts.has(tabList.length)) {
@@ -45,30 +49,25 @@ chrome.runtime.onMessage.addListener(
                 }
                 reportData.sort((a, b) => b.numberOfTabs - a.numberOfTabs);
 
-                console.log("Window Counts Report:\n");
-                console.log("Window Report:\n");
+                writeToPopupConsole("<br>Window Counts Report...<br>");
+                writeToPopupConsole("Window Report:<br>");
                 if (reportData.length === 0) {
-                    console.log("No report.");
+                    writeToPopupConsole("No report.<br>");
                 } else {
-                    console.log("--------------------------------------------------");
-
+                    writeToPopupConsole("--------------------------------------------------<br>");
                     for (const item of reportData) {
-
-                        console.log(`${item.count} windows have ${item.numberOfTabs} tabs`);
+                        writeToPopupConsole(`${item.count} windows have ${item.numberOfTabs} tabs<br>`);
                     }
-                    console.log("--------------------------------------------------");
+                    writeToPopupConsole("--------------------------------------------------<br>");
                 }
             });
-        }
-        else if (request.action === "domainReport") {
-            console.log("Received domainReport message.");
-
+        } else if (request.action === "domainReport") {
+            writeToPopupConsole("<br>Domain Report...<br>");
             chrome.tabs.query({}, function (tabs) {
-
-                console.log("Tabs queried:", tabs);
+                writeToPopupConsole(`Tabs queried:<br>${tabs.map(tab => `${tab.title}<br>`).join('')}`);
 
                 if (!tabs || tabs.length === 0) {
-                    console.log("No tabs found in any window.");
+                    writeToPopupConsole("No tabs found in any window.<br>");
                     return;
                 }
 
@@ -76,11 +75,8 @@ chrome.runtime.onMessage.addListener(
                 let duplicateCount = 0;
 
                 for (const tab of tabs) {
-                    //console.log("Processing tab:", tab.title, ":", tab.url, "group: None", "in window:", tab.windowId);
                     // extract the domain from the URL
                     let domain = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1];
-                    //console.log("Processing tab:", tab.title, ":", domain, "URL:", tab.url);
-
                     if (urls.has(domain)) {
                         urls.get(domain).push(tab);
                         duplicateCount++;
@@ -89,13 +85,12 @@ chrome.runtime.onMessage.addListener(
                     }
                 }
 
-                console.log("Total duplicate tabs found (across all windows):", duplicateCount, "in", urls.size, "unique urls", "out of", tabs.length, "total tabs");
+                writeToPopupConsole(`Total duplicate tabs found (across all windows): ${duplicateCount} in ${urls.size} unique URLs out of ${tabs.length} total tabs<br>`);
 
                 const reportData = [];
                 for (const [domain, tabList] of urls) {
                     reportData.push({
                         domain: domain,
-                        //title: tabList[0].title,
                         count: tabList.length,
                         tabs: tabList
                     });
@@ -103,85 +98,69 @@ chrome.runtime.onMessage.addListener(
 
                 reportData.sort((a, b) => b.count - a.count);
 
-                console.log("Domain Report:\n");
+                writeToPopupConsole(`Domain Report:<br>`);
                 if (reportData.length === 0) {
-                    console.log("No report.");
+                    writeToPopupConsole(`No report.<br>`);
                 } else {
-                    console.log("--------------------------------------------------");
-
+                    writeToPopupConsole(`--------------------------------------------------<br>`);
                     for (const item of reportData) {
                         const domain = item.domain;
                         let countString = item.count.toString();
-
-                        console.log(`${countString} : ${domain}`);
+                        writeToPopupConsole(`${countString} : ${domain}<br>`);
                     }
-                    console.log("--------------------------------------------------");
+                    writeToPopupConsole(`--------------------------------------------------<br>`);
                 }
             });
-        }
-        else if (request.action === "cleanUp") {
-            console.log("Received cleanUp message.");
-
+        } else if (request.action === "cleanUp") {
+            writeToPopupConsole(`<br>Clean Up...<br>`);
             chrome.tabs.query({}, function (tabs) {
-
-                console.log("Tabs queried:", tabs);
+                writeToPopupConsole(`Tabs queried: ${JSON.stringify(tabs)}`);
 
                 if (!tabs || tabs.length === 0) {
-                    console.log("No tabs found in any window.");
+                    writeToPopupConsole(`No tabs found in any window.`);
                     return;
                 }
 
                 // create a list of urls to close
                 // as long as they are not in a group
                 const urls = new Map();
-                //                urls.set("drive.google.com", true);
                 urls.set("mail.google.com", true);
                 urls.set("contacts.google.com", true);
-                //                urls.set("www.google.com ", true);
                 urls.set("jira.trimble.tools", true);
-                //                urls.set("notebooklm.google.com", true);
                 urls.set("photos.google.com", true);
                 urls.set("confluence.trimble.tools", true);
                 urls.set("newtab", true);
-                //                urls.set("bitbucket.trimble.tools", true);
                 urls.set("learn.trimble.com", true);
-                //                urls.set("trimble-arch.aha.io", true);
                 urls.set("community.trimble.com", true);
                 urls.set("calendar.google.com", true);
                 urls.set("trimble.okta.com", true);
                 urls.set("www.egencia.com", true);
 
                 // print all the urls to close
-                console.log("urls to close when not in tabs:", urls);
+                writeToPopupConsole(`URLs to close when not in tabs: ${JSON.stringify([...urls.keys()])}`);
 
-                let counter = 0
+                let counter = 0;
                 for (const tab of tabs) {
-                    //console.log("Processing tab:", tab.title, ":", tab.url, "group: None", "in window:", tab.windowId);
                     // extract the domain from the URL
                     let domain = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1];
-                    //console.log("Processing tab:", tab.title, ":", domain, "URL:", tab.url);
 
                     // if the tab is not in a tab group
                     // and it is in the list of urls to close
                     // then close it
                     if (tab.groupId === -1 && urls.has(domain)) {
-                        console.log("Closing tab:", domain, ":", tab.title, ":", tab.url, "group: None");
+                        writeToPopupConsole(`Closing tab: ${domain} : ${tab.title} : ${tab.url} : group: None`);
                         chrome.tabs.remove(tab.id);
                         counter++;
                     }
                 }
-                console.log("Total tabs closed:", counter);
+                writeToPopupConsole(`Total tabs closed: ${counter}`);
             });
-        }
-        else if (request.action === "duplicatesReport") {
-            console.log("Received duplicatesReport message.");
-
+        } else if (request.action === "duplicatesReport") {
+            writeToPopupConsole(`<br>Duplicates Report...<br>`);
             chrome.tabs.query({}, function (tabs) {
 
-                console.log("Tabs queried:", tabs);
-
                 if (!tabs || tabs.length === 0) {
-                    console.log("No tabs found in any window.");
+                    writeToPopupConsole(`No tabs found in any window.`);
                     return;
                 }
 
@@ -189,8 +168,6 @@ chrome.runtime.onMessage.addListener(
                 let duplicateCount = 0;
 
                 for (const tab of tabs) {
-                    //console.log("Processing tab:", tab.title, ":", tab.url, "group: None", "in window:", tab.windowId);
-
                     if (urls.has(tab.url)) {
                         urls.get(tab.url).push(tab);
                         duplicateCount++;
@@ -199,7 +176,7 @@ chrome.runtime.onMessage.addListener(
                     }
                 }
 
-                console.log("Total duplicate tabs found (across all windows):", duplicateCount, "in", urls.size, "unique urls", "out of", tabs.length, "total tabs");
+                writeToPopupConsole(`Total duplicate tabs found (across all windows): ${duplicateCount} in ${urls.size} unique URLs out of ${tabs.length} total tabs`);
 
                 const reportData = [];
                 for (const [url, tabList] of urls) {
@@ -213,34 +190,29 @@ chrome.runtime.onMessage.addListener(
 
                 reportData.sort((a, b) => b.count - a.count);
 
-                console.log("Duplicates Report:");
                 if (reportData.length === 0) {
-                    console.log("--empty--");
+                    writeToPopupConsole(`--empty--`);
                 } else {
-                    console.log("--------------------------------------------------\n");
-
+                    writeToPopupConsole(`--------------------------------------------------<br>`);
                     for (const item of reportData) {
                         const truncatedURL = item.url;
                         let countString = item.count.toString();
                         if (item.count > 1) {
-                            console.log(`${countString} : ${item.title} : ${truncatedURL}`);
+                            writeToPopupConsole(`${countString} : ${item.title} : ${truncatedURL}`);
                         }
-                    }                            
-                    console.log("--------------------------------------------------\n");
+                    }
+                    writeToPopupConsole(`--------------------------------------------------<br>`);
                 }
             });
-        }
-        else if (request.action === "duplicatesCleanUp") {
-            console.log("Received duplicatesCleanUp message.");
-            console.log("Closing duplicates in each group and those that have no group...");
-
+        } else if (request.action === "duplicatesCleanUp") {
+            writeToPopupConsole(`<br>Duplicates CleanUp...<br>`);
+            writeToPopupConsole(`Closing duplicates in each group and those that have no group...`);
             // close all duplicate tabs in the same group
             chrome.tabs.query({}, function (tabs) {
-
-                console.log("Tabs queried:", tabs);
+                writeToPopupConsole(`Tabs queried:<br>${tabs.map(tab => `${tab.title}<br>`).join('')}`);
 
                 if (!tabs || tabs.length === 0) {
-                    console.log("No tabs found in any window.");
+                    writeToPopupConsole(`No tabs found in any window.`);
                     return;
                 }
 
@@ -248,8 +220,6 @@ chrome.runtime.onMessage.addListener(
                 let duplicateCount = 0;
 
                 for (const tab of tabs) {
-                    //console.log("Processing tab:", tab.title, ":", tab.url, "group: None", "in window:", tab.windowId);
-
                     // create a hash that is the url and the group id
                     let hash = tab.url + tab.groupId;
                     if (urls.has(hash)) {
@@ -260,7 +230,7 @@ chrome.runtime.onMessage.addListener(
                     }
                 }
 
-                console.log("Total duplicate tabs found (across all windows):", duplicateCount, "in", urls.size, "unique urls", "out of", tabs.length, "total tabs");
+                writeToPopupConsole(`Total duplicate tabs found (across all windows): ${duplicateCount} in ${urls.size} unique URLs out of ${tabs.length} total tabs`);
 
                 let counter = 0;
                 for (const [hash, tabList] of urls) {
@@ -272,7 +242,7 @@ chrome.runtime.onMessage.addListener(
                             const tab = tabList[i];
                             // extract the domain from the URL                                
                             let domain = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1];
-                            console.log(domain, "Closing tab:", tab.title, ":", tab.url, "group:", tab.groupId);
+                            writeToPopupConsole(`Closing tab: ${domain} : ${tab.title} : ${tab.url} : group: ${tab.groupId}`);
                             chrome.tabs.remove(tab.id);
                             counter++;
                         }
@@ -315,23 +285,23 @@ chrome.runtime.onMessage.addListener(
                         }
                     }
                 }
-                console.log("Total tabs closed:", counter);
+                writeToPopupConsole(`Total tabs closed: ${counter}`);
             });
         }
         else if (request.action === "popForward1TabWindows") {
-            console.log("Received popForward1TabWindows message.");
-            console.log("Close the ones you no longer care about...");
+            writeToPopupConsole("Pop Forward 1 Tab Window:<br>");
+            writeToPopupConsole("Close the ones you no longer care about...<br>");
 
             chrome.tabs.query({}, function (tabs) {
 
-                console.log("Tabs queried:", tabs);
+                // console.log("Tabs queried:", tabs);
 
                 if (!tabs || tabs.length === 0) {
-                    console.log("No tabs found in any window.");
+                    writeToPopupConsole("No tabs found in any window<br>");
                     return;
                 }
 
-                console.log("Total tabs found in all windows:", tabs.length);
+                writeToPopupConsole(`Total tabs found in all windows: ${tabs.length}<br>`);
 
                 // print the number of windows open
                 let windowCount = 0;
@@ -343,31 +313,29 @@ chrome.runtime.onMessage.addListener(
                         windowMap.set(tab.windowId, [tab]);
                     }
                 }
-                console.log("Total windows open:", windowMap.size);
+                writeToPopupConsole(`Total windows open: ${windowMap.size}<br>`);
 
                 // loop through the windows and bring forward the those found that only has one tab
                 for (const [windowId, tabList] of windowMap) {
                     if (tabList.length === 1) {
-                        console.log("Bringing window forward with only one tab:", tabList[0].title, ":", tabList[0].url, "in window:", tabList[0].windowId);
+                        writeToPopupConsole(`Bringing window forward with only one tab: ${tabList[0].title} : ${tabList[0].url} in window: ${tabList[0].windowId}<br>`);
                         chrome.windows.update(tabList[0].windowId, { focused: true });
                     }
                 }
             });
         }
         else if (request.action === "popForward2TabWindows") {
-            console.log("Received popForward2TabWindows message.");
-            console.log("Close the ones you no longer care about...");
+            writeToPopupConsole("Pop Forward 2 Tab Windows:<br>");
+            writeToPopupConsole("Close the ones you no longer care about...<br>");
 
             chrome.tabs.query({}, function (tabs) {
 
-                console.log("Tabs queried:", tabs);
-
                 if (!tabs || tabs.length === 0) {
-                    console.log("No tabs found in any window.");
+                    writeToPopupConsole("No tabs found in any window<br>");
                     return;
                 }
 
-                console.log("Total tabs found in all windows:", tabs.length);
+                writeToPopupConsole(`Total tabs found in all windows: ${tabs.length}<br>`);
 
                 // print the number of windows open
                 let windowCount = 0;
@@ -379,31 +347,28 @@ chrome.runtime.onMessage.addListener(
                         windowMap.set(tab.windowId, [tab]);
                     }
                 }
-                console.log("Total windows open:", windowMap.size);
+                writeToPopupConsole(`Total windows open: ${windowMap.size}<br>`);
 
                 // loop through the windows and bring forward the those found that only has one tab
                 for (const [windowId, tabList] of windowMap) {
                     if (tabList.length === 2) {
-                        console.log("Bringing window forward with only one tab:", tabList[0].title, ":", tabList[0].url, "in window:", tabList[0].windowId);
+                        writeToPopupConsole(`Bringing window forward with only two tabs: ${tabList[0].title} : ${tabList[0].url} in window: ${tabList[0].windowId}<br>`);
                         chrome.windows.update(tabList[0].windowId, { focused: true });
                     }
                 }
             });
         }
         else if (request.action === "popForward3TabWindows") {
-            console.log("Received popForward3TabWindows message.");
-            console.log("Close the ones you no longer care about...");
+            writeToPopupConsole("Pop Forward 3 Tab Windows:<br>");
+            writeToPopupConsole("Close the ones you no longer care about...<br>");
 
             chrome.tabs.query({}, function (tabs) {
-
-                console.log("Tabs queried:", tabs);
-
                 if (!tabs || tabs.length === 0) {
-                    console.log("No tabs found in any window.");
+                    writeToPopupConsole("No tabs found in any window.");
                     return;
                 }
 
-                console.log("Total tabs found in all windows:", tabs.length);
+                writeToPopupConsole(`Total tabs found in all windows: ${tabs.length}<br>`);
 
                 // print the number of windows open
                 let windowCount = 0;
@@ -415,31 +380,28 @@ chrome.runtime.onMessage.addListener(
                         windowMap.set(tab.windowId, [tab]);
                     }
                 }
-                console.log("Total windows open:", windowMap.size);
+                writeToPopupConsole(`Total windows open: ${windowMap.size}<br>`);
 
                 // loop through the windows and bring forward the those found that only has one tab
                 for (const [windowId, tabList] of windowMap) {
                     if (tabList.length === 3) {
-                        console.log("Bringing window forward with only one tab:", tabList[0].title, ":", tabList[0].url, "in window:", tabList[0].windowId);
+                        writeToPopupConsole(`Bringing window forward with only three tabs: ${tabList[0].title} : ${tabList[0].url} in window: ${tabList[0].windowId}<br>`);
                         chrome.windows.update(tabList[0].windowId, { focused: true });
                     }
                 }
             });
         }
         else if (request.action === "popForwardWindowsWithNoGroups") {
-            console.log("Received popForwardWindowsWithNoGroups message.");
-            console.log("Close the ones you no longer care about...");
+            writeToPopupConsole("Pop Forward Windows With No Groups:<br>");
+            writeToPopupConsole("Close the ones you no longer care about...<br>");
 
             chrome.tabs.query({}, function (tabs) {
-
-                console.log("Tabs queried:", tabs);
-
                 if (!tabs || tabs.length === 0) {
-                    console.log("No tabs found in any window.");
+                    writeToPopupConsole("No tabs found in any window<br>");
                     return;
                 }
 
-                console.log("Total tabs found in all windows:", tabs.length);
+                writeToPopupConsole(`Total tabs found in all windows: ${tabs.length}<br>`);
 
                 // print the number of windows open
                 let windowCount = 0;
@@ -451,7 +413,7 @@ chrome.runtime.onMessage.addListener(
                         windowMap.set(tab.windowId, [tab]);
                     }
                 }
-                console.log("Total windows open:", windowMap.size);
+                writeToPopupConsole(`Total windows open: ${windowMap.size}<br>`);
 
                 // loop through the windows and bring forward the those found that have no groups on them
                 let counter = 0;
@@ -465,11 +427,11 @@ chrome.runtime.onMessage.addListener(
                     }
                     if (!bHasGroupOnIt) {
                         counter++;
-                        console.log("Bringing window forward with no groups:", tabList[0].title, ":", tabList[0].url, "in window:", tabList[0].windowId);
+                        writeToPopupConsole(`Bringing window forward with no groups: ${tabList[0].title} : ${tabList[0].url} in window: ${tabList[0].windowId}<br>`);
                         chrome.windows.update(tabList[0].windowId, { focused: true });
                     }
                 }
-                console.log("Total windows brought forward:", counter);
+                writeToPopupConsole(`Total windows brought forward: ${counter}<br>`);
             });
         }
 
